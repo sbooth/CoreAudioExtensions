@@ -22,6 +22,7 @@ Add a package dependency to https://github.com/sbooth/CoreAudioExtensions in Xco
 | --- | --- |
 | [AudioChannelLayout](Sources/CoreAudioExtensions/AudioChannelLayout+SFBExtensions.swift) | |
 | [AudioStreamBasicDescription](Sources/CoreAudioExtensions/AudioStreamBasicDescription+SFBExtensions.swift) | Common format support |
+| [AudioValueRange](Sources/CoreAudioExtensions/AudioValueRange+SFBExtensions.swift) | |
 
 ## Documentation
 

@@ -12,4 +12,10 @@ final class CoreAudioExtensionsTests: XCTestCase {
 		XCTAssertTrue(asbd.channelStreamCount == 2)
 		XCTAssertTrue(asbd.packetDuration == 1/44100)
 	}
+
+	func testAudioValueRange() {
+		let avr = AudioValueRange(mMinimum: 22050, mMaximum: 88200)
+		XCTAssertTrue(avr.contains(44100))
+		XCTAssertFalse(avr.contains(176400))
+	}
 }
