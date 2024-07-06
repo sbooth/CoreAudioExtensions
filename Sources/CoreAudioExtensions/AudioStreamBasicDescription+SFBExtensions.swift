@@ -1,5 +1,5 @@
 //
-// Copyright (c) 2006 - 2023 Stephen F. Booth <me@sbooth.org>
+// Copyright © 2006-2024 Stephen F. Booth <me@sbooth.org>
 // Part of https://github.com/sbooth/CoreAudioExtensions
 // MIT license
 //
@@ -212,15 +212,29 @@ extension AudioStreamBasicDescription {
 
 extension AudioStreamBasicDescription: Equatable {
 	public static func == (lhs: AudioStreamBasicDescription, rhs: AudioStreamBasicDescription) -> Bool {
-		return
-			lhs.mFormatID == rhs.mFormatID &&
-			lhs.mFormatFlags == rhs.mFormatFlags &&
-			lhs.mSampleRate == rhs.mSampleRate &&
-			lhs.mChannelsPerFrame == rhs.mChannelsPerFrame &&
-			lhs.mBitsPerChannel == rhs.mBitsPerChannel &&
-			lhs.mBytesPerPacket == rhs.mBytesPerPacket &&
-			lhs.mFramesPerPacket == rhs.mFramesPerPacket &&
-			lhs.mBytesPerFrame == rhs.mBytesPerFrame
+		lhs.mFormatID == rhs.mFormatID &&
+		lhs.mFormatFlags == rhs.mFormatFlags &&
+		lhs.mSampleRate == rhs.mSampleRate &&
+		lhs.mChannelsPerFrame == rhs.mChannelsPerFrame &&
+		lhs.mBitsPerChannel == rhs.mBitsPerChannel &&
+		lhs.mBytesPerPacket == rhs.mBytesPerPacket &&
+		lhs.mFramesPerPacket == rhs.mFramesPerPacket &&
+		lhs.mBytesPerFrame == rhs.mBytesPerFrame
+	}
+}
+
+infix operator ~==: ComparisonPrecedence
+extension AudioStreamBasicDescription {
+	/// Returns `true` if `lhs` and `rhs` are congruent.
+	public static func ~== (lhs: AudioStreamBasicDescription, rhs: AudioStreamBasicDescription) -> Bool {
+		(lhs.mFormatID == rhs.mFormatID || lhs.mFormatID == 0 || rhs.mFormatID == 0) &&
+		(lhs.mFormatFlags == rhs.mFormatFlags || lhs.mFormatFlags == 0 || rhs.mFormatFlags == 0) &&
+		(lhs.mSampleRate == rhs.mSampleRate || lhs.mSampleRate == 0 || rhs.mSampleRate == 0) &&
+		(lhs.mChannelsPerFrame == rhs.mChannelsPerFrame || lhs.mChannelsPerFrame == 0 || rhs.mChannelsPerFrame == 0) &&
+		(lhs.mBitsPerChannel == rhs.mBitsPerChannel || lhs.mBitsPerChannel == 0 || rhs.mBitsPerChannel == 0) &&
+		(lhs.mBytesPerPacket == rhs.mBytesPerPacket || lhs.mBytesPerPacket == 0 || rhs.mBytesPerPacket == 0) &&
+		(lhs.mFramesPerPacket == rhs.mFramesPerPacket || lhs.mFramesPerPacket == 0 || rhs.mFramesPerPacket == 0) &&
+		(lhs.mBytesPerFrame == rhs.mBytesPerFrame || lhs.mBytesPerFrame == 0 || rhs.mBytesPerFrame == 0)
 	}
 }
 
