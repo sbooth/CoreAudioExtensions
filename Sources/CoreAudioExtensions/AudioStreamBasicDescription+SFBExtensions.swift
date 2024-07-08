@@ -347,7 +347,7 @@ extension AudioStreamBasicDescription: /*@retroactive*/ CustomDebugStringConvert
 }
 #endif
 
-/// Returns `value`interpreted as a four character code.
+/// Returns `value` interpreted as a four character code.
 private func fourCC(_ value: UInt32) -> String {
 	let chars: [UInt8] = [UInt8((value >> 24) & 0xff), UInt8((value >> 16) & 0xff), UInt8((value >> 8) & 0xff), UInt8(value & 0xff), 0]
 	return String(cString: chars)
