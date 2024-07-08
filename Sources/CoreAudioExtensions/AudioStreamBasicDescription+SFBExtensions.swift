@@ -208,62 +208,20 @@ extension AudioStreamBasicDescription {
 		memset(&self, 0, MemoryLayout<AudioStreamBasicDescription>.stride);
 	}
 
-}
-
-extension AudioStreamBasicDescription: Equatable {
-	public static func == (lhs: AudioStreamBasicDescription, rhs: AudioStreamBasicDescription) -> Bool {
-		lhs.mFormatID == rhs.mFormatID &&
-		lhs.mFormatFlags == rhs.mFormatFlags &&
-		lhs.mSampleRate == rhs.mSampleRate &&
-		lhs.mChannelsPerFrame == rhs.mChannelsPerFrame &&
-		lhs.mBitsPerChannel == rhs.mBitsPerChannel &&
-		lhs.mBytesPerPacket == rhs.mBytesPerPacket &&
-		lhs.mFramesPerPacket == rhs.mFramesPerPacket &&
-		lhs.mBytesPerFrame == rhs.mBytesPerFrame
+	/// Returns true if `self` is equal to `other`
+	public func isEqualTo(_ other: AudioStreamBasicDescription) -> Bool {
+		mFormatID == other.mFormatID &&
+		mFormatFlags == other.mFormatFlags &&
+		mSampleRate == other.mSampleRate &&
+		mChannelsPerFrame == other.mChannelsPerFrame &&
+		mBitsPerChannel == other.mBitsPerChannel &&
+		mBytesPerPacket == other.mBytesPerPacket &&
+		mFramesPerPacket == other.mFramesPerPacket &&
+		mBytesPerFrame == other.mBytesPerFrame
 	}
-}
 
-infix operator ~==: ComparisonPrecedence
-extension AudioStreamBasicDescription {
-	/// Returns `true` if `lhs` and `rhs` are congruent.
-	public static func ~== (lhs: AudioStreamBasicDescription, rhs: AudioStreamBasicDescription) -> Bool {
-		(lhs.mFormatID == rhs.mFormatID || lhs.mFormatID == 0 || rhs.mFormatID == 0) &&
-		(lhs.mFormatFlags == rhs.mFormatFlags || lhs.mFormatFlags == 0 || rhs.mFormatFlags == 0) &&
-		(lhs.mSampleRate == rhs.mSampleRate || lhs.mSampleRate == 0 || rhs.mSampleRate == 0) &&
-		(lhs.mChannelsPerFrame == rhs.mChannelsPerFrame || lhs.mChannelsPerFrame == 0 || rhs.mChannelsPerFrame == 0) &&
-		(lhs.mBitsPerChannel == rhs.mBitsPerChannel || lhs.mBitsPerChannel == 0 || rhs.mBitsPerChannel == 0) &&
-		(lhs.mBytesPerPacket == rhs.mBytesPerPacket || lhs.mBytesPerPacket == 0 || rhs.mBytesPerPacket == 0) &&
-		(lhs.mFramesPerPacket == rhs.mFramesPerPacket || lhs.mFramesPerPacket == 0 || rhs.mFramesPerPacket == 0) &&
-		(lhs.mBytesPerFrame == rhs.mBytesPerFrame || lhs.mBytesPerFrame == 0 || rhs.mBytesPerFrame == 0)
-	}
-}
-
-private func makeLinearPCMFlags(validBitsPerChannel: UInt32, totalBitsPerChannel: UInt32, isFloat float: Bool, isBigEndian bigEndian: Bool, isNonInterleaved nonInterleaved: Bool) -> AudioFormatFlags
-{
-	return (float ? kAudioFormatFlagIsFloat : kAudioFormatFlagIsSignedInteger) | (bigEndian ? kAudioFormatFlagIsBigEndian : 0) | ((validBitsPerChannel == totalBitsPerChannel) ? kAudioFormatFlagIsPacked : kAudioFormatFlagIsAlignedHigh) | (nonInterleaved ? kAudioFormatFlagIsNonInterleaved : 0);
-}
-
-private func makeASBDForLinearPCM(sampleRate: Float64, channelsPerFrame: UInt32, validBitsPerChannel: UInt32, totalBitsPerChannel: UInt32, isFloat float: Bool, isBigEndian bigEndian: Bool, isNonInterleaved nonInterleaved: Bool) -> AudioStreamBasicDescription
-{
-	var asbd = AudioStreamBasicDescription()
-
-	asbd.mFormatID = kAudioFormatLinearPCM;
-	asbd.mFormatFlags = makeLinearPCMFlags(validBitsPerChannel: validBitsPerChannel, totalBitsPerChannel: totalBitsPerChannel, isFloat: float, isBigEndian: bigEndian, isNonInterleaved: nonInterleaved);
-
-	asbd.mSampleRate = sampleRate;
-	asbd.mChannelsPerFrame = channelsPerFrame;
-	asbd.mBitsPerChannel = validBitsPerChannel;
-
-	asbd.mBytesPerPacket = (nonInterleaved ? 1 : channelsPerFrame) * (totalBitsPerChannel / 8);
-	asbd.mFramesPerPacket = 1;
-	asbd.mBytesPerFrame = (nonInterleaved ? 1 : channelsPerFrame) * (totalBitsPerChannel / 8);
-
-	return asbd
-}
-
-extension AudioStreamBasicDescription: CustomDebugStringConvertible {
-	// A textual representation of this instance, suitable for debugging.
-	public var debugDescription: String {
+	/// Returns a description of `self`
+	public var streamDescription: String {
 		// General description
 		var result = String(format: "%u ch, %.2f Hz, '%@' (0x%0.8x) ", mChannelsPerFrame, mSampleRate, fourCC(mFormatID), mFormatFlags)
 
@@ -331,6 +289,63 @@ extension AudioStreamBasicDescription: CustomDebugStringConvertible {
 		return result
 	}
 }
+
+#if false
+// Disabled to avoid warning about conformance of imported type to imported protocol
+extension AudioStreamBasicDescription: /*@retroactive*/ Equatable {
+	public static func == (lhs: AudioStreamBasicDescription, rhs: AudioStreamBasicDescription) -> Bool {
+		lhs.isEqualTo(rhs)
+	}
+}
+#endif
+
+infix operator ~==: ComparisonPrecedence
+extension AudioStreamBasicDescription {
+	/// Returns `true` if `lhs` and `rhs` are congruent.
+	public static func ~== (lhs: AudioStreamBasicDescription, rhs: AudioStreamBasicDescription) -> Bool {
+		(lhs.mFormatID == rhs.mFormatID || lhs.mFormatID == 0 || rhs.mFormatID == 0) &&
+		(lhs.mFormatFlags == rhs.mFormatFlags || lhs.mFormatFlags == 0 || rhs.mFormatFlags == 0) &&
+		(lhs.mSampleRate == rhs.mSampleRate || lhs.mSampleRate == 0 || rhs.mSampleRate == 0) &&
+		(lhs.mChannelsPerFrame == rhs.mChannelsPerFrame || lhs.mChannelsPerFrame == 0 || rhs.mChannelsPerFrame == 0) &&
+		(lhs.mBitsPerChannel == rhs.mBitsPerChannel || lhs.mBitsPerChannel == 0 || rhs.mBitsPerChannel == 0) &&
+		(lhs.mBytesPerPacket == rhs.mBytesPerPacket || lhs.mBytesPerPacket == 0 || rhs.mBytesPerPacket == 0) &&
+		(lhs.mFramesPerPacket == rhs.mFramesPerPacket || lhs.mFramesPerPacket == 0 || rhs.mFramesPerPacket == 0) &&
+		(lhs.mBytesPerFrame == rhs.mBytesPerFrame || lhs.mBytesPerFrame == 0 || rhs.mBytesPerFrame == 0)
+	}
+}
+
+private func makeLinearPCMFlags(validBitsPerChannel: UInt32, totalBitsPerChannel: UInt32, isFloat float: Bool, isBigEndian bigEndian: Bool, isNonInterleaved nonInterleaved: Bool) -> AudioFormatFlags
+{
+	return (float ? kAudioFormatFlagIsFloat : kAudioFormatFlagIsSignedInteger) | (bigEndian ? kAudioFormatFlagIsBigEndian : 0) | ((validBitsPerChannel == totalBitsPerChannel) ? kAudioFormatFlagIsPacked : kAudioFormatFlagIsAlignedHigh) | (nonInterleaved ? kAudioFormatFlagIsNonInterleaved : 0);
+}
+
+private func makeASBDForLinearPCM(sampleRate: Float64, channelsPerFrame: UInt32, validBitsPerChannel: UInt32, totalBitsPerChannel: UInt32, isFloat float: Bool, isBigEndian bigEndian: Bool, isNonInterleaved nonInterleaved: Bool) -> AudioStreamBasicDescription
+{
+	var asbd = AudioStreamBasicDescription()
+
+	asbd.mFormatID = kAudioFormatLinearPCM;
+	asbd.mFormatFlags = makeLinearPCMFlags(validBitsPerChannel: validBitsPerChannel, totalBitsPerChannel: totalBitsPerChannel, isFloat: float, isBigEndian: bigEndian, isNonInterleaved: nonInterleaved);
+
+	asbd.mSampleRate = sampleRate;
+	asbd.mChannelsPerFrame = channelsPerFrame;
+	asbd.mBitsPerChannel = validBitsPerChannel;
+
+	asbd.mBytesPerPacket = (nonInterleaved ? 1 : channelsPerFrame) * (totalBitsPerChannel / 8);
+	asbd.mFramesPerPacket = 1;
+	asbd.mBytesPerFrame = (nonInterleaved ? 1 : channelsPerFrame) * (totalBitsPerChannel / 8);
+
+	return asbd
+}
+
+#if false
+// Disabled to avoid warning about conformance of imported type to imported protocol
+extension AudioStreamBasicDescription: /*@retroactive*/ CustomDebugStringConvertible {
+	// A textual representation of this instance, suitable for debugging.
+	public var debugDescription: String {
+		streamDescription
+	}
+}
+#endif
 
 /// Returns `value`interpreted as a four character code.
 private func fourCC(_ value: UInt32) -> String {
