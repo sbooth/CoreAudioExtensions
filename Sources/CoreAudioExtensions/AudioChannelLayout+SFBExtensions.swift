@@ -18,6 +18,17 @@ extension AudioChannelLayout {
 			return AudioChannelLayoutTag_GetNumberOfChannels(mChannelLayoutTag)
 		}
 	}
+
+	/// Returns a description of `self`
+	public var layoutDescription: String {
+		if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
+			return "\(channelCount) ch, using descriptions"
+		} else if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
+			return "\(channelCount) ch, bitmap 0x\(String(mChannelBitmap.rawValue, radix: 16)) [\(mChannelBitmap.bitmapDescription)]"
+		} else {
+			return "\(channelCount) ch, tag 0x\(String(mChannelLayoutTag, radix: 16)) \"\(mChannelLayoutTag.channelLayoutTagName)\""
+		}
+	}
 }
 
 extension AudioChannelDescription {
