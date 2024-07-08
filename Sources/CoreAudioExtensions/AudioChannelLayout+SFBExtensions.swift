@@ -30,7 +30,6 @@ extension AudioChannelDescription {
 		}
 	}
 
-
 	/// Returns true if `self` is equal to `other`
 	public func isEqualTo(_ other: AudioChannelDescription) -> Bool {
 		if mChannelLabel == kAudioChannelLabel_UseCoordinates {
