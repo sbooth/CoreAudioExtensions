@@ -41,6 +41,15 @@ extension AudioChannelDescription {
 	}
 }
 
+#if false
+// Disabled to avoid warning about conformance of imported type to imported protocol
+extension AudioChannelDescription: Equatable {
+	public static func == (lhs: AudioChannelDescription, rhs: AudioChannelDescription) -> Bool {
+		lhs.isEqualTo(rhs)
+	}
+}
+#endif
+
 extension AudioChannelLayoutTag {
 	/// Returns the name of the `AudioChannelLayoutTag`value of `self`
 	public var channelLayoutTagName: String {
