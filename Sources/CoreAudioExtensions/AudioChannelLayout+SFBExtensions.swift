@@ -29,6 +29,16 @@ extension AudioChannelDescription {
 			return mChannelLabel.channelLabelName
 		}
 	}
+
+
+	/// Returns true if `self` is equal to `other`
+	public func isEqualTo(_ other: AudioChannelDescription) -> Bool {
+		if mChannelLabel == kAudioChannelLabel_UseCoordinates {
+			return other.mChannelLabel == kAudioChannelLabel_UseCoordinates && mChannelFlags == other.mChannelFlags && mCoordinates == other.mCoordinates
+		} else {
+			return mChannelLabel == other.mChannelLabel
+		}
+	}
 }
 
 extension AudioChannelLayoutTag {
