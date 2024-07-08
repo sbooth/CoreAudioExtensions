@@ -29,7 +29,25 @@ extension AudioChannelDescription {
 			return mChannelLabel.channelLabelName
 		}
 	}
+
+	/// Returns true if `self` is equal to `other`
+	public func isEqualTo(_ other: AudioChannelDescription) -> Bool {
+		if mChannelLabel == kAudioChannelLabel_UseCoordinates {
+			return other.mChannelLabel == kAudioChannelLabel_UseCoordinates && mChannelFlags == other.mChannelFlags && mCoordinates == other.mCoordinates
+		} else {
+			return mChannelLabel == other.mChannelLabel
+		}
+	}
 }
+
+#if false
+// Disabled to avoid warning about conformance of imported type to imported protocol
+extension AudioChannelDescription: Equatable {
+	public static func == (lhs: AudioChannelDescription, rhs: AudioChannelDescription) -> Bool {
+		lhs.isEqualTo(rhs)
+	}
+}
+#endif
 
 extension AudioChannelLayoutTag {
 	/// Returns the name of the `AudioChannelLayoutTag`value of `self`
