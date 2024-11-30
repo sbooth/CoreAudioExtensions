@@ -319,6 +319,7 @@ extension AudioChannelLayoutTag {
 			return "Discrete in Order \(String(self & 0xFFFF))"
 		case kAudioChannelLayoutTag_Unknown:
 			return "Unknown \(String(self & 0xFFFF))"
+
 		default:
 			break
 		}
@@ -638,6 +639,7 @@ extension AudioChannelBitmap {
 				result.append("Center Top Rear")
 			case .bit_RightTopRear:
 				result.append("Right Top Rear")
+
 			default:
 				result.append("0x\(String(bit.rawValue, radix: 16, uppercase: false))")
 			}
@@ -658,6 +660,7 @@ extension AudioChannelFlags {
 				result.append("Spherical Coordinates")
 			case .meters:
 				result.append("Meters")
+
 			default:
 				result.append("0x\(String(bit.rawValue, radix: 16, uppercase: false))")
 			}
