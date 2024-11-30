@@ -8,12 +8,22 @@ import Foundation
 import CoreAudioTypes
 
 extension AudioChannelLayout {
+	/// Returns `true` if this channel layout uses channel descriptions
+	public var usesChannelDescriptions: Bool {
+		return mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions
+	}
+
+	/// Returns `true` if this channel layout uses a channel bitmap
+	public var usesChannelBitmap: Bool {
+		return mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap
+	}
+
 	/// Returns the number of channels in this channel layout
 	public var channelCount: UInt32 {
 		if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
 			return mNumberChannelDescriptions
 		} else if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
-			return UInt32(mChannelBitmap.rawValue.nonzeroBitCount)
+			return mChannelBitmap.channelCount
 		} else {
 			return AudioChannelLayoutTag_GetNumberOfChannels(mChannelLayoutTag)
 		}
@@ -26,7 +36,7 @@ extension AudioChannelLayout {
 			let channelDescriptions = withUnsafeChannelDescriptions({ $0.map({ $0.channelDescription }).joined(separator: ", ") })
 			return "\(channelCount) ch, [\(channelDescriptions)]"
 		} else if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
-			let channelCount = mChannelBitmap.rawValue.nonzeroBitCount
+			let channelCount = mChannelBitmap.channelCount
 			return "\(channelCount) ch, bitmap 0x\(String(mChannelBitmap.rawValue, radix: 16)) [\(mChannelBitmap.bitmapDescription)]"
 		} else {
 			let channelCount = AudioChannelLayoutTag_GetNumberOfChannels(mChannelLayoutTag)
@@ -48,6 +58,11 @@ extension AudioChannelLayout {
 }
 
 extension AudioChannelDescription {
+	/// Returns `true` if this channel description uses coordinates
+	public var usesCoordinates: Bool {
+		return mChannelLabel == kAudioChannelLabel_UseCoordinates
+	}
+
 	/// Returns a description of `self`
 	public var channelDescription: String {
 		if mChannelLabel == kAudioChannelLabel_UseCoordinates {
@@ -596,6 +611,12 @@ extension OptionSet where RawValue: FixedWidthInteger {
 }
 
 extension AudioChannelBitmap {
+	/// Returns the number of channels in this channel bitmap
+	/// - note: The number of channels is the non-zero bit count of the bitmap
+	public var channelCount: UInt32 {
+		return UInt32(rawValue.nonzeroBitCount)
+	}
+
 	/// Returns the names of the channel bits in `self`
 	public var bitmapDescription: String {
 		var result = [String]()
@@ -665,6 +686,21 @@ extension AudioChannelBitmap {
 }
 
 extension AudioChannelFlags {
+	/// Returns `true` if the channel is specified using rectangular coordinates
+	public var usesRectangularCoordinates: Bool {
+		return contains(.rectangularCoordinates)
+	}
+
+	/// Returns `true` if the channel is specified using spherical coordinates
+	public var usesSphericalCoordinates: Bool {
+		return contains(.sphericalCoordinates)
+	}
+
+	/// Returns `true` if the channel coordinates are specified using meters
+	public var usesMeters: Bool {
+		return contains(.meters)
+	}
+
 	/// Returns the names of the flags in `self`
 	public var channelFlagsDescription: String {
 		var result = [String]()
