@@ -22,11 +22,27 @@ extension AudioChannelLayout {
 	/// Returns a description of `self`
 	public var layoutDescription: String {
 		if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
-			return "\(channelCount) ch, using descriptions"
+			let channelCount = mNumberChannelDescriptions
+			let channelDescriptions = withUnsafeChannelDescriptions({ $0.map({ $0.channelDescription }).joined(separator: " | ") })
+			return "\(channelCount) ch, descriptions \(channelDescriptions)"
 		} else if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
+			let channelCount = mChannelBitmap.rawValue.nonzeroBitCount
 			return "\(channelCount) ch, bitmap 0x\(String(mChannelBitmap.rawValue, radix: 16)) [\(mChannelBitmap.bitmapDescription)]"
 		} else {
+			let channelCount = AudioChannelLayoutTag_GetNumberOfChannels(mChannelLayoutTag)
 			return "\(channelCount) ch, tag 0x\(String(mChannelLayoutTag, radix: 16)) \"\(mChannelLayoutTag.channelLayoutTagName)\""
+		}
+	}
+
+	/// Performs a closure with this channel layout's channel descriptions
+	/// - precondition: `mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions`
+	/// - parameter body: A closure
+	/// - returns: Any value returned by `body`
+	/// - throws: Any error thrown by `body`
+	public func withUnsafeChannelDescriptions<T>(_ body: (UnsafeBufferPointer<AudioChannelDescription>) throws -> T) rethrows -> T {
+		precondition(mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions, "mChannelDescriptions is not valid unless mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions")
+		return try withUnsafePointer(to: mChannelDescriptions) { up in
+			try body(UnsafeBufferPointer(start: up, count: Int(mNumberChannelDescriptions)))
 		}
 	}
 }
