@@ -23,8 +23,8 @@ extension AudioChannelLayout {
 	public var layoutDescription: String {
 		if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
 			let channelCount = mNumberChannelDescriptions
-			let channelDescriptions = withUnsafeChannelDescriptions({ $0.map({ $0.channelDescription }).joined(separator: " | ") })
-			return "\(channelCount) ch, descriptions \(channelDescriptions)"
+			let channelDescriptions = withUnsafeChannelDescriptions({ $0.map({ $0.channelDescription }).joined(separator: ", ") })
+			return "\(channelCount) ch, [\(channelDescriptions)]"
 		} else if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
 			let channelCount = mChannelBitmap.rawValue.nonzeroBitCount
 			return "\(channelCount) ch, bitmap 0x\(String(mChannelBitmap.rawValue, radix: 16)) [\(mChannelBitmap.bitmapDescription)]"
