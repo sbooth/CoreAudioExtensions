@@ -33,26 +33,13 @@ extension AudioChannelLayout {
 	public var layoutDescription: String {
 		if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions {
 			let channelCount = mNumberChannelDescriptions
-			let channelDescriptions = withUnsafeChannelDescriptions({ $0.map({ $0.channelDescription }).joined(separator: ", ") })
-			return "\(channelCount) ch, [\(channelDescriptions)]"
+			return "\(channelCount) ch, using channel descriptions"
 		} else if mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap {
 			let channelCount = mChannelBitmap.channelCount
-			return "\(channelCount) ch, bitmap 0x\(String(mChannelBitmap.rawValue, radix: 16)) [\(mChannelBitmap.bitmapDescription)]"
+			return "\(channelCount) ch, [\(mChannelBitmap.bitmapDescription)] (0x\(String(mChannelBitmap.rawValue, radix: 16)))"
 		} else {
 			let channelCount = AudioChannelLayoutTag_GetNumberOfChannels(mChannelLayoutTag)
-			return "\(channelCount) ch, tag 0x\(String(mChannelLayoutTag, radix: 16)) \"\(mChannelLayoutTag.channelLayoutTagName)\""
-		}
-	}
-
-	/// Performs a closure with this channel layout's channel descriptions
-	/// - precondition: `mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions`
-	/// - parameter body: A closure
-	/// - returns: Any value returned by `body`
-	/// - throws: Any error thrown by `body`
-	public func withUnsafeChannelDescriptions<T>(_ body: (UnsafeBufferPointer<AudioChannelDescription>) throws -> T) rethrows -> T {
-		precondition(mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions, "mChannelDescriptions is not valid unless mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions")
-		return try withUnsafePointer(to: mChannelDescriptions) { up in
-			try body(UnsafeBufferPointer(start: up, count: Int(mNumberChannelDescriptions)))
+			return "\(channelCount) ch, \(mChannelLayoutTag.channelLayoutTagName) (0x\(String(mChannelLayoutTag, radix: 16)))"
 		}
 	}
 }
@@ -96,9 +83,9 @@ extension AudioChannelLayoutTag {
 	public var channelLayoutTagName: String {
 		switch self {
 		case kAudioChannelLayoutTag_UseChannelDescriptions:
-			return "Use Channel Descriptions";
+			return "Use Channel Descriptions"
 		case kAudioChannelLayoutTag_UseChannelBitmap:
-			return "Use Channel Bitmap";
+			return "Use Channel Bitmap"
 		case kAudioChannelLayoutTag_Mono:
 			return "Mono"
 		case kAudioChannelLayoutTag_Stereo:
@@ -288,54 +275,54 @@ extension AudioChannelLayoutTag {
 		case kAudioChannelLayoutTag_Atmos_9_1_6:
 			return "Atmos 9.1.6"
 		case kAudioChannelLayoutTag_Logic_4_0_C:
-			return "Logic 4.0 C";
+			return "Logic 4.0 C"
 		case kAudioChannelLayoutTag_Logic_6_0_B:
-			return "Logic 6.0 B";
+			return "Logic 6.0 B"
 		case kAudioChannelLayoutTag_Logic_6_1_B:
-			return "Logic 6.1 B";
+			return "Logic 6.1 B"
 		case kAudioChannelLayoutTag_Logic_6_1_D:
-			return "Logic 6.1 D";
+			return "Logic 6.1 D"
 		case kAudioChannelLayoutTag_Logic_7_1_B:
-			return "Logic 7.1 B";
+			return "Logic 7.1 B"
 		case kAudioChannelLayoutTag_Logic_Atmos_7_1_4_B:
-			return "Logic Atmos 7.1.4 B";
+			return "Logic Atmos 7.1.4 B"
 		case kAudioChannelLayoutTag_Logic_Atmos_7_1_6:
-			return "Logic Atmos 7.1.6";
+			return "Logic Atmos 7.1.6"
 		case kAudioChannelLayoutTag_CICP_13:
-			return "CICP 13";
+			return "CICP 13"
 		case kAudioChannelLayoutTag_CICP_14:
-			return "CICP 14";
+			return "CICP 14"
 		case kAudioChannelLayoutTag_CICP_15:
-			return "CICP 15";
+			return "CICP 15"
 		case kAudioChannelLayoutTag_CICP_16:
-			return "CICP 16";
+			return "CICP 16"
 		case kAudioChannelLayoutTag_CICP_17:
-			return "CICP 17";
+			return "CICP 17"
 		case kAudioChannelLayoutTag_CICP_18:
-			return "CICP 18";
+			return "CICP 18"
 		case kAudioChannelLayoutTag_CICP_19:
-			return "CICP 19";
+			return "CICP 19"
 		case kAudioChannelLayoutTag_CICP_20:
-			return "CICP 20";
+			return "CICP 20"
 		case kAudioChannelLayoutTag_Ogg_5_0:
-			return "Ogg 5.0";
+			return "Ogg 5.0"
 		case kAudioChannelLayoutTag_Ogg_5_1:
-			return "Ogg 5.1";
+			return "Ogg 5.1"
 		case kAudioChannelLayoutTag_Ogg_6_1:
-			return "Ogg 6.1";
+			return "Ogg 6.1"
 		case kAudioChannelLayoutTag_Ogg_7_1:
-			return "Ogg 7.1";
+			return "Ogg 7.1"
 		case kAudioChannelLayoutTag_MPEG_5_0_E:
-			return "MPEG 5.0 E";
+			return "MPEG 5.0 E"
 		case kAudioChannelLayoutTag_MPEG_5_1_E:
-			return "MPEG 5.1 E";
+			return "MPEG 5.1 E"
 		case kAudioChannelLayoutTag_MPEG_6_1_B:
-			return "MPEG 6.1 B";
+			return "MPEG 6.1 B"
 		case kAudioChannelLayoutTag_MPEG_7_1_D:
-			return "MPEG 7.1 D";
+			return "MPEG 7.1 D"
 
 		case kAudioChannelLayoutTag_BeginReserved...kAudioChannelLayoutTag_EndReserved:
-			return "Reserved";
+			return "Reserved"
 
 		default:
 			break
@@ -442,29 +429,29 @@ extension AudioChannelLabel {
 		case kAudioChannelLabel_RightTopRear:
 			return "Right Top Rear"
 		case kAudioChannelLabel_LeftSideSurround:
-			return "Left Side Surround";
+			return "Left Side Surround"
 		case kAudioChannelLabel_RightSideSurround:
-			return "Right Side Surround";
+			return "Right Side Surround"
 		case kAudioChannelLabel_LeftBottom:
-			return "Left Bottom";
+			return "Left Bottom"
 		case kAudioChannelLabel_RightBottom:
-			return "Right Bottom";
+			return "Right Bottom"
 		case kAudioChannelLabel_CenterBottom:
-			return "Center Bottom";
+			return "Center Bottom"
 		case kAudioChannelLabel_LeftTopSurround:
-			return "Left Top Surround";
+			return "Left Top Surround"
 		case kAudioChannelLabel_RightTopSurround:
-			return "Right Top Surround";
+			return "Right Top Surround"
 		case kAudioChannelLabel_LFE3:
-			return "LFE3";
+			return "LFE3"
 		case kAudioChannelLabel_LeftBackSurround:
-			return "Left Back Surround";
+			return "Left Back Surround"
 		case kAudioChannelLabel_RightBackSurround:
-			return "Right Back Surround";
+			return "Right Back Surround"
 		case kAudioChannelLabel_LeftEdgeOfScreen:
-			return "Left Edge of Screen";
+			return "Left Edge of Screen"
 		case kAudioChannelLabel_RightEdgeOfScreen:
-			return "Right Edge of Screen";
+			return "Right Edge of Screen"
 		case kAudioChannelLabel_Ambisonic_W:
 			return "Ambisonic W"
 		case kAudioChannelLabel_Ambisonic_X:
@@ -567,7 +554,7 @@ extension AudioChannelLabel {
 			return "HOA ACN 65024"
 
 		case kAudioChannelLabel_BeginReserved...kAudioChannelLabel_EndReserved:
-			return "Reserved";
+			return "Reserved"
 
 		default:
 			break
@@ -575,9 +562,9 @@ extension AudioChannelLabel {
 
 		switch (self & 0xFFFF0000) {
 		case kAudioChannelLabel_HOA_N3D:
-			return "HOA N3D \(String(self & 0xFFFF))";
+			return "HOA N3D \(String(self & 0xFFFF))"
 		case kAudioChannelLabel_Object:
-			return "Object \(String(self & 0xFFFF))";
+			return "Object \(String(self & 0xFFFF))"
 
 		default:
 			break
