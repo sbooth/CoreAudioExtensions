@@ -10,12 +10,12 @@ import CoreAudioTypes
 extension AudioChannelLayout {
 	/// Returns `true` if this channel layout uses channel descriptions
 	public var usesChannelDescriptions: Bool {
-		return mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions
+		mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions
 	}
 
 	/// Returns `true` if this channel layout uses a channel bitmap
 	public var usesChannelBitmap: Bool {
-		return mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap
+		mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap
 	}
 
 	/// Returns the number of channels in this channel layout
@@ -47,7 +47,7 @@ extension AudioChannelLayout {
 extension AudioChannelDescription {
 	/// Returns `true` if this channel description uses coordinates
 	public var usesCoordinates: Bool {
-		return mChannelLabel == kAudioChannelLabel_UseCoordinates
+		mChannelLabel == kAudioChannelLabel_UseCoordinates
 	}
 
 	/// Returns a description of `self`
@@ -601,7 +601,7 @@ extension AudioChannelBitmap {
 	/// Returns the number of channels in this channel bitmap
 	/// - note: The number of channels is the non-zero bit count of the bitmap
 	public var channelCount: UInt32 {
-		return UInt32(rawValue.nonzeroBitCount)
+		UInt32(rawValue.nonzeroBitCount)
 	}
 
 	/// Returns the names of the channel bits in `self`
@@ -675,17 +675,17 @@ extension AudioChannelBitmap {
 extension AudioChannelFlags {
 	/// Returns `true` if the channel is specified using rectangular coordinates
 	public var usesRectangularCoordinates: Bool {
-		return contains(.rectangularCoordinates)
+		contains(.rectangularCoordinates)
 	}
 
 	/// Returns `true` if the channel is specified using spherical coordinates
 	public var usesSphericalCoordinates: Bool {
-		return contains(.sphericalCoordinates)
+		contains(.sphericalCoordinates)
 	}
 
 	/// Returns `true` if the channel coordinates are specified using meters
 	public var usesMeters: Bool {
-		return contains(.meters)
+		contains(.meters)
 	}
 
 	/// Returns the names of the flags in `self`

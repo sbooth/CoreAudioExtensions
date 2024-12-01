@@ -50,84 +50,84 @@ extension AudioStreamBasicDescription {
 
 	/// Returns `true` if this format is non-interleaved
 	public var isNonInterleaved: Bool {
-		return mFormatFlags & kAudioFormatFlagIsNonInterleaved == kAudioFormatFlagIsNonInterleaved
+		mFormatFlags & kAudioFormatFlagIsNonInterleaved == kAudioFormatFlagIsNonInterleaved
 	}
 
 	/// Returns `true` if this format is interleaved
 	public var isInterleaved: Bool {
-		return mFormatFlags & kAudioFormatFlagIsNonInterleaved == 0
+		mFormatFlags & kAudioFormatFlagIsNonInterleaved == 0
 	}
 
 	/// Returns the number of interleaved channels
 	public var interleavedChannelCount: UInt32 {
-		return isInterleaved ? mChannelsPerFrame : 1
+		isInterleaved ? mChannelsPerFrame : 1
 	}
 
 	/// Returns the number of channel streams
 	public var channelStreamCount: UInt32 {
-		return isInterleaved ? 1 : mChannelsPerFrame
+		isInterleaved ? 1 : mChannelsPerFrame
 	}
 
 	/// Returns the number of channels
 	public var channelCount: UInt32 {
-		return mChannelsPerFrame
+		mChannelsPerFrame
 	}
 
 	/// Returns `true` if this format is linear PCM
 	public var isPCM: Bool {
-		return mFormatID == kAudioFormatLinearPCM
+		mFormatID == kAudioFormatLinearPCM
 	}
 
 	/// Returns `true` if this format is big-endian
 	public var isBigEndian: Bool {
-		return mFormatFlags & kAudioFormatFlagIsBigEndian == kAudioFormatFlagIsBigEndian
+		mFormatFlags & kAudioFormatFlagIsBigEndian == kAudioFormatFlagIsBigEndian
 	}
 
 	/// Returns `true` if this format is little-endian
 	public var isLittleEndian: Bool {
-		return mFormatFlags & kAudioFormatFlagIsBigEndian == 0
+		mFormatFlags & kAudioFormatFlagIsBigEndian == 0
 	}
 
 	/// Returns `true` if this format is native-endian
 	public var isNativeEndian: Bool {
-		return mFormatFlags & kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian
+		mFormatFlags & kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian
 	}
 
 	/// Returns `true` if this format is floating-point linear PCM
 	public var isFloat: Bool {
-		return isPCM && mFormatFlags & kAudioFormatFlagIsFloat == kAudioFormatFlagIsFloat
+		isPCM && mFormatFlags & kAudioFormatFlagIsFloat == kAudioFormatFlagIsFloat
 	}
 
 	/// Returns `true` if this format is integer linear PCM
 	public var isInteger: Bool {
-		return isPCM && mFormatFlags & kAudioFormatFlagIsFloat == 0
+		isPCM && mFormatFlags & kAudioFormatFlagIsFloat == 0
 	}
 
 	/// Returns `true` if this format is signed integer linear PCM
 	public var isSignedInteger: Bool {
-		return isPCM && mFormatFlags & kAudioFormatFlagIsSignedInteger == kAudioFormatFlagIsSignedInteger
+		isPCM && mFormatFlags & kAudioFormatFlagIsSignedInteger == kAudioFormatFlagIsSignedInteger
 	}
 
 	/// Returns `true` if this format is packed
 	public var isPacked: Bool {
-		return mFormatFlags & kAudioFormatFlagIsPacked == kAudioFormatFlagIsPacked
+		mFormatFlags & kAudioFormatFlagIsPacked == kAudioFormatFlagIsPacked
 	}
 
 	/// Returns `true` if this format is high-aligned
 	public var isAlignedHigh: Bool {
-		return mFormatFlags & kAudioFormatFlagIsAlignedHigh == kAudioFormatFlagIsAlignedHigh
+		mFormatFlags & kAudioFormatFlagIsAlignedHigh == kAudioFormatFlagIsAlignedHigh
 	}
 
 	/// Returns `true` if this format is non-mixable
 	/// - note: This flag is only used when interacting with HAL stream formats
 	public var isNonMixable: Bool {
-		return mFormatFlags & kAudioFormatFlagIsNonMixable == kAudioFormatFlagIsNonMixable
+		mFormatFlags & kAudioFormatFlagIsNonMixable == kAudioFormatFlagIsNonMixable
 	}
 
 	/// Returns `true` if this format is mixable
 	/// - note: This flag is only used when interacting with HAL stream formats
 	public var isMixable: Bool {
-		return isPCM && mFormatFlags & kAudioFormatFlagIsNonMixable == 0
+		isPCM && mFormatFlags & kAudioFormatFlagIsNonMixable == 0
 	}
 
 	/// Returns the sample word size in bytes
@@ -143,7 +143,7 @@ extension AudioStreamBasicDescription {
 	/// Returns the byte size of `frameCount` audio frames
 	/// - note: This is equivalent to `frameCount * mBytesPerFrame`
 	public func byteSize(forFrameCount frameCount: Int) -> Int {
-		return frameCount * Int(mBytesPerFrame)
+		frameCount * Int(mBytesPerFrame)
 	}
 
 	/// Returns the frame count of `byteSize` bytes
