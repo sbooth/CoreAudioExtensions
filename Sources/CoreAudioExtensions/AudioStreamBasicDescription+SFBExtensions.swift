@@ -118,6 +118,16 @@ extension AudioStreamBasicDescription {
 		mFormatFlags & kAudioFormatFlagIsAlignedHigh == kAudioFormatFlagIsAlignedHigh
 	}
 
+	/// Returns the number of fractional bits
+	public var fractionalBits: Int {
+		Int((mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >> kLinearPCMFormatFlagsSampleFractionShift)
+	}
+
+	/// Returns `true` if this format is integer fixed-point PCM
+	public var isFixedPoint: Bool {
+		isInteger && fractionalBits > 0
+	}
+
 	/// Returns `true` if this format is non-mixable
 	/// - note: This flag is only used when interacting with HAL stream formats
 	public var isNonMixable: Bool {
