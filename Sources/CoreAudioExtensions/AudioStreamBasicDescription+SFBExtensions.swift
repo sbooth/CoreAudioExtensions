@@ -6,7 +6,6 @@
 
 import Foundation
 import CoreAudioTypes
-import FourCC
 
 extension AudioStreamBasicDescription {
 
@@ -362,3 +361,16 @@ extension AudioStreamBasicDescription: /*@retroactive*/ CustomDebugStringConvert
 	}
 }
 #endif
+
+extension UInt32 {
+	/// Returns the value of `self` as a four character code string.
+	var fourCC: String {
+		String(cString: [
+			UInt8(self >> 24),
+			UInt8((self >> 16) & 0xff),
+			UInt8((self >> 8) & 0xff),
+			UInt8(self & 0xff),
+			0
+		])
+	}
+}

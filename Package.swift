@@ -12,15 +12,9 @@ let package = Package(
 				"CoreAudioExtensions",
 			]),
 	],
-	dependencies: [
-		.package(url: "https://github.com/sbooth/FourCC", from: "0.1.0"),
-	],
 	targets: [
 		.target(
-			name: "CoreAudioExtensions",
-			dependencies: [
-				.product(name: "FourCC", package: "FourCC"),
-			]),
+			name: "CoreAudioExtensions"),
 		.testTarget(
 			name: "CoreAudioExtensionsTests",
 			dependencies: [
