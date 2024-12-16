@@ -45,6 +45,38 @@ extension AudioStreamBasicDescription {
 		}
 	}
 
+	/// Returns the common PCM format described by `self` or `nil` if none
+	public var commonFormat: CommonPCMFormat? {
+		guard isPCM, isNativeEndian else {
+			return nil
+		}
+
+		if isSignedInteger {
+			let isPacked = isPacked || ((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame
+			guard isPacked else {
+				return nil
+			}
+
+			if mBitsPerChannel == 16 {
+				return .int16
+			} else if mBitsPerChannel == 32 {
+				return .int32
+			} else {
+				return nil
+			}
+		} else if isFloat {
+			if mBitsPerChannel == 32 {
+				return .float32
+			} else if mBitsPerChannel == 64 {
+				return .float64
+			} else {
+				return nil
+			}
+		} else {
+			return nil
+		}
+	}
+
 	// MARK: Format Information
 
 	/// Returns `true` if this format is non-interleaved
