@@ -52,7 +52,6 @@ extension AudioStreamBasicDescription {
 		}
 
 		if isSignedInteger {
-			let isPacked = isPacked || ((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame
 			guard isPacked else {
 				return nil
 			}
@@ -140,8 +139,10 @@ extension AudioStreamBasicDescription {
 	}
 
 	/// Returns `true` if this format is packed
+	///
+	/// A format is considered packed even if `kAudioFormatFlagIsPacked` is clear when `((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame`
 	public var isPacked: Bool {
-		mFormatFlags & kAudioFormatFlagIsPacked == kAudioFormatFlagIsPacked
+		mFormatFlags & kAudioFormatFlagIsPacked == kAudioFormatFlagIsPacked || ((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame
 	}
 
 	/// Returns `true` if this format is high-aligned
