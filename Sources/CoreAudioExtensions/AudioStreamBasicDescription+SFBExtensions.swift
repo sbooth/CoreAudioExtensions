@@ -47,12 +47,16 @@ extension AudioStreamBasicDescription {
 
 	/// Returns the common PCM format described by `self` or `nil` if none
 	public var commonFormat: CommonPCMFormat? {
-		guard isPCM, isNativeEndian else {
+		guard mFramesPerPacket == 1, mBytesPerFrame == mBytesPerPacket, mChannelsPerFrame > 0 else {
+			return nil
+		}
+
+		guard isPCM, isNativeEndian, isImplicitlyPacked else {
 			return nil
 		}
 
 		if isSignedInteger {
-			guard isPacked || isImplicitlyPacked else {
+			guard !isFixedPoint else {
 				return nil
 			}
 
@@ -141,9 +145,9 @@ extension AudioStreamBasicDescription {
 
 	/// Returns `true` if this format is implicitly packed
 	///
-	/// A format is implicitly packed when `((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame`
+	/// A format is implicitly packed when `((mBitsPerChannel / 8) * interleavedChannelCount) == mBytesPerFrame`
 	public var isImplicitlyPacked: Bool {
-		((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame
+		((mBitsPerChannel / 8) * interleavedChannelCount) == mBytesPerFrame
 	}
 
 	/// Returns `true` if `kAudioFormatFlagIsAlignedHigh` is set
@@ -177,7 +181,8 @@ extension AudioStreamBasicDescription {
 	public var sampleWordSize: Int {
 		let interleavedChannelCount = self.interleavedChannelCount
 //		assert(interleavedChannelCount != 0, "self.interleavedChannelCount == 0 in sampleWordSize")
-		if(interleavedChannelCount == 0) {
+//		assert(mBytesPerFrame % interleavedChannelCount == 0, "mBytesPerFrame % interleavedChannelCount != 0 in sampleWordSize")
+		if(interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount == 0) {
 			return 0
 		}
 		return Int(mBytesPerFrame / interleavedChannelCount)
