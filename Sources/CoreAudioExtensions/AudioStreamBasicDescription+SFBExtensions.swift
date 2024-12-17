@@ -60,30 +60,26 @@ extension AudioStreamBasicDescription {
 				return .int16
 			} else if mBitsPerChannel == 32 {
 				return .int32
-			} else {
-				return nil
 			}
 		} else if isFloat {
 			if mBitsPerChannel == 32 {
 				return .float32
 			} else if mBitsPerChannel == 64 {
 				return .float64
-			} else {
-				return nil
 			}
-		} else {
-			return nil
 		}
+
+		return nil
 	}
 
 	// MARK: Format Information
 
-	/// Returns `true` if this format is non-interleaved
+	/// Returns `true` if `kAudioFormatFlagIsNonInterleaved` is set
 	public var isNonInterleaved: Bool {
 		mFormatFlags & kAudioFormatFlagIsNonInterleaved == kAudioFormatFlagIsNonInterleaved
 	}
 
-	/// Returns `true` if this format is interleaved
+	/// Returns `true` if `kAudioFormatFlagIsNonInterleaved` is clear
 	public var isInterleaved: Bool {
 		mFormatFlags & kAudioFormatFlagIsNonInterleaved == 0
 	}
@@ -103,17 +99,17 @@ extension AudioStreamBasicDescription {
 		mChannelsPerFrame
 	}
 
-	/// Returns `true` if this format is linear PCM
+	/// Returns `true` if `mFormatID == kAudioFormatLinearPCM`
 	public var isPCM: Bool {
 		mFormatID == kAudioFormatLinearPCM
 	}
 
-	/// Returns `true` if this format is big-endian
+	/// Returns `true` if `kAudioFormatFlagIsBigEndian` is set
 	public var isBigEndian: Bool {
 		mFormatFlags & kAudioFormatFlagIsBigEndian == kAudioFormatFlagIsBigEndian
 	}
 
-	/// Returns `true` if this format is little-endian
+	/// Returns `true` if `kAudioFormatFlagIsBigEndian` is clear
 	public var isLittleEndian: Bool {
 		mFormatFlags & kAudioFormatFlagIsBigEndian == 0
 	}
@@ -123,29 +119,34 @@ extension AudioStreamBasicDescription {
 		mFormatFlags & kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian
 	}
 
-	/// Returns `true` if this format is floating-point linear PCM
+	/// Returns `true` if this format is linear PCM and `kAudioFormatFlagIsFloat` is set
 	public var isFloat: Bool {
 		isPCM && mFormatFlags & kAudioFormatFlagIsFloat == kAudioFormatFlagIsFloat
 	}
 
-	/// Returns `true` if this format is integer linear PCM
+	/// Returns `true` if this format is linear PCM and `kAudioFormatFlagIsFloat` is clear
 	public var isInteger: Bool {
 		isPCM && mFormatFlags & kAudioFormatFlagIsFloat == 0
 	}
 
-	/// Returns `true` if this format is signed integer linear PCM
+	/// Returns `true` if this format is linear PCM and `kAudioFormatFlagIsSignedInteger` is set
 	public var isSignedInteger: Bool {
 		isPCM && mFormatFlags & kAudioFormatFlagIsSignedInteger == kAudioFormatFlagIsSignedInteger
 	}
 
-	/// Returns `true` if this format is packed
-	///
-	/// A format is considered packed even if `kAudioFormatFlagIsPacked` is clear when `((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame`
+	/// Returns `true` if `kAudioFormatFlagIsPacked` is set
 	public var isPacked: Bool {
-		mFormatFlags & kAudioFormatFlagIsPacked == kAudioFormatFlagIsPacked || ((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame
+		mFormatFlags & kAudioFormatFlagIsPacked == kAudioFormatFlagIsPacked
 	}
 
-	/// Returns `true` if this format is high-aligned
+	/// Returns `true` if this format is implicitly packed
+	///
+	/// A format is implicitly packed when `((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame`
+	public var isImplicitlyPacked: Bool {
+		((mBitsPerChannel / 8) * mChannelsPerFrame) == mBytesPerFrame
+	}
+
+	/// Returns `true` if `kAudioFormatFlagIsAlignedHigh` is set
 	public var isAlignedHigh: Bool {
 		mFormatFlags & kAudioFormatFlagIsAlignedHigh == kAudioFormatFlagIsAlignedHigh
 	}
@@ -155,18 +156,18 @@ extension AudioStreamBasicDescription {
 		Int((mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >> kLinearPCMFormatFlagsSampleFractionShift)
 	}
 
-	/// Returns `true` if this format is integer fixed-point PCM
+	/// Returns `true` if this format is integer fixed-point linear PCM
 	public var isFixedPoint: Bool {
 		isInteger && fractionalBits > 0
 	}
 
-	/// Returns `true` if this format is non-mixable
+	/// Returns `true` if `kAudioFormatFlagIsNonMixable` is set
 	/// - note: This flag is only used when interacting with HAL stream formats
 	public var isNonMixable: Bool {
 		mFormatFlags & kAudioFormatFlagIsNonMixable == kAudioFormatFlagIsNonMixable
 	}
 
-	/// Returns `true` if this format is mixable
+	/// Returns `true` if this format is linear PCM and `kAudioFormatFlagIsNonMixable` is clear
 	/// - note: This flag is only used when interacting with HAL stream formats
 	public var isMixable: Bool {
 		isPCM && mFormatFlags & kAudioFormatFlagIsNonMixable == 0
