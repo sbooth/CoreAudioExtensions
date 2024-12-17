@@ -192,7 +192,7 @@ extension AudioStreamBasicDescription {
 		let interleavedChannelCount = self.interleavedChannelCount
 //		assert(interleavedChannelCount != 0, "self.interleavedChannelCount == 0 in sampleWordSize")
 //		assert(mBytesPerFrame % interleavedChannelCount == 0, "mBytesPerFrame % interleavedChannelCount != 0 in sampleWordSize")
-		if(interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount == 0) {
+		if(interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount != 0) {
 			return 0
 		}
 		return Int(mBytesPerFrame / interleavedChannelCount)
