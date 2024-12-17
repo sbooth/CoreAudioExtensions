@@ -295,7 +295,7 @@ extension AudioStreamBasicDescription {
 	public var streamDescription: String {
 		var result: String
 
-		// Sample rate and channels
+		// Channels and sample rate
 		if(rint(mSampleRate) == mSampleRate) {
 			result = "\(mChannelsPerFrame) ch @ \(Int64(mSampleRate)) Hz, "
 		} else {
