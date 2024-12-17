@@ -315,7 +315,7 @@ extension AudioStreamBasicDescription {
 				result.append("Float64, ")
 			}
 
-			if mFormatFlags & kAudioFormatFlagIsNonInterleaved != 0 {
+			if isNonInterleaved {
 				result.append("deinterleaved")
 			} else {
 				result.append("interleaved")
@@ -326,7 +326,7 @@ extension AudioStreamBasicDescription {
 
 		if isPCM {
 			// Bit depth
-			let fractionalBits = fractionalBits
+			let fractionalBits = self.fractionalBits
 			if fractionalBits > 0 {
 				result.append(String(format: "%d.%d-bit", Int(mBitsPerChannel) - fractionalBits, fractionalBits))
 			} else {
@@ -334,8 +334,8 @@ extension AudioStreamBasicDescription {
 			}
 
 			// Endianness
-			let sampleSize = sampleWordSize
-			if sampleSize > 1 {
+			let sampleWordSize = self.sampleWordSize
+			if sampleWordSize > 1 {
 				result.append(isBigEndian ? " big-endian" : " little-endian")
 			}
 
@@ -349,17 +349,17 @@ extension AudioStreamBasicDescription {
 			result.append(isInteger ? " integer" : " float")
 
 			// Packedness and alignment
-			if sampleSize > 0 {
+			if sampleWordSize > 0 {
 				if isImplicitlyPacked {
 					result.append(", packed")
 				} else if isUnaligned {
 					result.append(isAlignedHigh ? ", high-aligned" : ", low-aligned")
 				}
 
-				result.append(" in \(sampleSize) bytes")
+				result.append(" in \(sampleWordSize) bytes")
 			}
 
-			if !isInterleaved {
+			if isNonInterleaved {
 				result.append(", deinterleaved")
 			}
 		} else if mFormatID == kAudioFormatAppleLossless || mFormatID == kAudioFormatFLAC {
@@ -385,15 +385,15 @@ extension AudioStreamBasicDescription {
 				result.append("from UNKNOWN source bit depth, ")
 			}
 
-			result.append(" \(mFramesPerPacket) frames/packet")
+			result.append("\(mFramesPerPacket) frames/packet")
 		} else {
+			result.append("\(formatIDName(mFormatID))")
+
 			if mFormatFlags != 0 {
 				result.append(String(format: " [0x%.08x]", mFormatFlags))
 			}
 
-			result.append(", \(formatIDName(mFormatID)), ")
-
-			result.append("\(mBitsPerChannel) bits/channel, \(mBytesPerPacket) bytes/packet, \(mFramesPerPacket) frames/packet, \(mBytesPerFrame) bytes/frame")
+			result.append(", \(mBitsPerChannel) bits/channel, \(mBytesPerPacket) bytes/packet, \(mFramesPerPacket) frames/packet, \(mBytesPerFrame) bytes/frame")
 		}
 
 		return result
