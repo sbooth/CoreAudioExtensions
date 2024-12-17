@@ -150,9 +150,19 @@ extension AudioStreamBasicDescription {
 		((mBitsPerChannel / 8) * interleavedChannelCount) == mBytesPerFrame
 	}
 
+	/// Returns `true` if this format is linear PCM and the sample bits do not occupy the entire channel
+	public var isUnpackedPCM: Bool {
+		isPCM && (sampleWordSize << 3) != mBitsPerChannel
+	}
+
 	/// Returns `true` if `kAudioFormatFlagIsAlignedHigh` is set
 	public var isAlignedHigh: Bool {
 		mFormatFlags & kAudioFormatFlagIsAlignedHigh == kAudioFormatFlagIsAlignedHigh
+	}
+
+	/// Returns `true` if this format is unpacked linear PCM or if `mBitsPerChannel` is not a multiple of 8
+	public var isUnaligned: Bool {
+		isUnpackedPCM || (mBitsPerChannel & 7) != 0
 	}
 
 	/// Returns the number of fractional bits
