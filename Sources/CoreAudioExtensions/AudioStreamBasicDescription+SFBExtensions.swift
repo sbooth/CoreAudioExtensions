@@ -52,7 +52,7 @@ extension AudioStreamBasicDescription {
 		}
 
 		if isSignedInteger {
-			guard isPacked else {
+			guard isPacked || isImplicitlyPacked else {
 				return nil
 			}
 
