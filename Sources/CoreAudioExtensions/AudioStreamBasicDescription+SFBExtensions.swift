@@ -293,25 +293,54 @@ extension AudioStreamBasicDescription {
 
 	/// Returns a description of `self`
 	public var streamDescription: String {
-		// General description
-		var result = String(format: "%u ch, %.2f Hz, '%@' (0x%0.8x) ", mChannelsPerFrame, mSampleRate, mFormatID.fourCC, mFormatFlags)
+		var result: String
+
+		// Channels and sample rate
+		if(rint(mSampleRate) == mSampleRate) {
+			result = "\(mChannelsPerFrame) ch @ \(Int64(mSampleRate)) Hz, "
+		} else {
+			result = String(format: "\(mChannelsPerFrame) ch @ %.2f Hz, ", mSampleRate)
+		}
+
+		// Shorter description for common formats
+		if let commonFormat {
+			switch commonFormat {
+			case .int16:
+				result.append("Int16, ")
+			case .int32:
+				result.append("Int32, ")
+			case .float32:
+				result.append("Float32, ")
+			case .float64:
+				result.append("Float64, ")
+			}
+
+			if isNonInterleaved {
+				result.append("deinterleaved")
+			} else {
+				result.append("interleaved")
+			}
+
+			return result
+		}
 
 		if isPCM {
 			// Bit depth
-			let fractionalBits = (mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >> kLinearPCMFormatFlagsSampleFractionShift
+			let fractionalBits = self.fractionalBits
 			if fractionalBits > 0 {
-				result.append(String(format: "%d.%d-bit", mBitsPerChannel - fractionalBits, fractionalBits))
+				result.append(String(format: "%d.%d-bit", Int(mBitsPerChannel) - fractionalBits, fractionalBits))
 			} else {
-				result.append(String(format: "%d-bit", mBitsPerChannel))
+				result.append("\(mBitsPerChannel)-bit")
 			}
 
 			// Endianness
-			let sampleSize = mBytesPerFrame > 0 && interleavedChannelCount > 0 ? mBytesPerFrame / interleavedChannelCount : 0
-			if sampleSize > 1 {
+			let sampleWordSize = self.sampleWordSize
+			if sampleWordSize > 1 {
 				result.append(isBigEndian ? " big-endian" : " little-endian")
 			}
 
 			// Sign
+			let isInteger = self.isInteger
 			if isInteger {
 				result.append(isSignedInteger ? " signed" : " unsigned")
 			}
@@ -319,19 +348,23 @@ extension AudioStreamBasicDescription {
 			// Integer or floating
 			result.append(isInteger ? " integer" : " float")
 
-			// Packedness
-			if sampleSize > 0 && ((sampleSize << 3) != mBitsPerChannel) {
-				result.append(String(format: isPacked ? ", packed in %d bytes" : ", unpacked in %d bytes", sampleSize))
-			}
-			// Alignment
-			if (sampleSize > 0 && ((sampleSize << 3) != mBitsPerChannel)) || ((mBitsPerChannel & 7) != 0) {
-				result.append(isAlignedHigh ? " high-aligned" : " low-aligned")
+			// Packedness and alignment
+			if sampleWordSize > 0 {
+				if isImplicitlyPacked {
+					result.append(", packed")
+				} else if isUnaligned {
+					result.append(isAlignedHigh ? ", high-aligned" : ", low-aligned")
+				}
+
+				result.append(" in \(sampleWordSize) bytes")
 			}
 
-			if !isInterleaved {
+			if isNonInterleaved {
 				result.append(", deinterleaved")
 			}
-		} else if mFormatID == kAudioFormatAppleLossless {
+		} else if mFormatID == kAudioFormatAppleLossless || mFormatID == kAudioFormatFLAC {
+			result.append("\(formatIDName(mFormatID)), ")
+
 			var sourceBitDepth: UInt32 = 0;
 			switch mFormatFlags {
 			case kAppleLosslessFormatFlag_16BitSourceData:
@@ -347,14 +380,20 @@ extension AudioStreamBasicDescription {
 			}
 
 			if sourceBitDepth != 0 {
-				result.append(String(format: "from %d-bit source, ", sourceBitDepth))
+				result.append("from \(sourceBitDepth))-bit source, ")
 			} else {
 				result.append("from UNKNOWN source bit depth, ")
 			}
 
-			result.append(String(format: " %d frames/packet", mFramesPerPacket))
+			result.append("\(mFramesPerPacket) frames/packet")
 		} else {
-			result.append(String(format: "%u bits/channel, %u bytes/packet, %u frames/packet, %u bytes/frame", mBitsPerChannel, mBytesPerPacket, mFramesPerPacket, mBytesPerFrame))
+			result.append("\(formatIDName(mFormatID))")
+
+			if mFormatFlags != 0 {
+				result.append(String(format: " (0x%.08x)", mFormatFlags))
+			}
+
+			result.append(", \(mBitsPerChannel) bits/channel, \(mBytesPerPacket) bytes/packet, \(mFramesPerPacket) frames/packet, \(mBytesPerFrame) bytes/frame")
 		}
 
 		return result
@@ -401,6 +440,60 @@ private func makeASBDForLinearPCM(sampleRate: Float64, channelsPerFrame: UInt32,
 	return asbd
 }
 
+/// Returns a descriptive format name for `formatID`
+private func formatIDName(_ formatID: AudioFormatID) -> String {
+	switch formatID {
+	case kAudioFormatLinearPCM: 			return "Linear PCM"
+	case kAudioFormatAC3: 					return "AC-3"
+	case kAudioFormat60958AC3: 				return "AC-3 over IEC 60958"
+	case kAudioFormatAppleIMA4: 			return "IMA 4:1 ADPCM"
+	case kAudioFormatMPEG4AAC: 				return "MPEG-4 Low Complexity AAC"
+	case kAudioFormatMPEG4CELP: 			return "MPEG-4 CELP"
+	case kAudioFormatMPEG4HVXC: 			return "MPEG-4 HVXC"
+	case kAudioFormatMPEG4TwinVQ: 			return "MPEG-4 TwinVQ"
+	case kAudioFormatMACE3: 				return "MACE 3:1"
+	case kAudioFormatMACE6: 				return "MACE 6:1"
+	case kAudioFormatULaw: 					return "µ-law 2:1"
+	case kAudioFormatALaw: 					return "A-law 2:1"
+	case kAudioFormatQDesign: 				return "QDesign music"
+	case kAudioFormatQDesign2: 				return "QDesign2 music"
+	case kAudioFormatQUALCOMM :				return "QUALCOMM PureVoice"
+	case kAudioFormatMPEGLayer1: 			return "MPEG-1/2 Layer I"
+	case kAudioFormatMPEGLayer2: 			return "MPEG-1/2 Layer II"
+	case kAudioFormatMPEGLayer3: 			return "MPEG-1/2 Layer III"
+	case kAudioFormatTimeCode: 				return "Stream of IOAudioTimeStamps"
+	case kAudioFormatMIDIStream: 			return "Stream of MIDIPacketLists"
+	case kAudioFormatParameterValueStream: 	return "Float32 side-chain"
+	case kAudioFormatAppleLossless: 		return "Apple Lossless"
+	case kAudioFormatMPEG4AAC_HE: 			return "MPEG-4 High Efficiency AAC"
+	case kAudioFormatMPEG4AAC_LD: 			return "MPEG-4 AAC Low Delay"
+	case kAudioFormatMPEG4AAC_ELD: 			return "MPEG-4 AAC Enhanced Low Delay"
+	case kAudioFormatMPEG4AAC_ELD_SBR: 		return "MPEG-4 AAC Enhanced Low Delay with SBR extension"
+	case kAudioFormatMPEG4AAC_ELD_V2: 		return "MPEG-4 AAC Enhanced Low Delay Version 2"
+	case kAudioFormatMPEG4AAC_HE_V2: 		return "MPEG-4 High Efficiency AAC Version 2"
+	case kAudioFormatMPEG4AAC_Spatial: 		return "MPEG-4 Spatial Audio"
+	case kAudioFormatMPEGD_USAC: 			return "MPEG-D Unified Speech and Audio Coding"
+	case kAudioFormatAMR: 					return "AMR Narrow Band"
+	case kAudioFormatAMR_WB: 				return "AMR Wide Band"
+	case kAudioFormatAudible: 				return "Audible"
+	case kAudioFormatiLBC: 					return "iLBC narrow band"
+	case kAudioFormatDVIIntelIMA: 			return "DVI/Intel IMA ADPCM"
+	case kAudioFormatMicrosoftGSM: 			return "Microsoft GSM 6.10"
+	case kAudioFormatAES3: 					return "AES3-2003"
+	case kAudioFormatEnhancedAC3: 			return "Enhanced AC-3"
+	case kAudioFormatFLAC: 					return "Free Lossless Audio Codec"
+	case kAudioFormatOpus: 					return "Opus"
+	case kAudioFormatAPAC: 					return "Apple Positional Audio Codec"
+
+	default:
+		if formatID.isPrintable {
+			return "'\(formatID.fourCC)'"
+		} else {
+			return String(format: "0x%.02x%.02x%.02x%.02x", UInt8(formatID >> 24), UInt8((formatID >> 16) & 0xff), UInt8((formatID >> 8) & 0xff), UInt8(formatID & 0xff))
+		}
+	}
+}
+
 #if false
 // Disabled to avoid warning about conformance of imported type to imported protocol
 extension AudioStreamBasicDescription: /*@retroactive*/ CustomDebugStringConvertible {
@@ -411,7 +504,7 @@ extension AudioStreamBasicDescription: /*@retroactive*/ CustomDebugStringConvert
 }
 #endif
 
-extension UInt32 {
+private extension UInt32 {
 	/// Returns the value of `self` as a four character code string.
 	var fourCC: String {
 		String(cString: [
@@ -421,5 +514,13 @@ extension UInt32 {
 			UInt8(self & 0xff),
 			0
 		])
+	}
+
+	/// Returns `true` if `self` consists of four printable ASCII characters
+	var isPrintable: Bool {
+		func isPrint(_ c: UInt8) -> Bool {
+			c > 0x1f && c < 0x7f
+		}
+		return isPrint(UInt8(self >> 24)) && isPrint(UInt8((self >> 16) & 0xff)) && isPrint(UInt8((self >> 8) & 0xff)) && isPrint(UInt8(self & 0xff))
 	}
 }
