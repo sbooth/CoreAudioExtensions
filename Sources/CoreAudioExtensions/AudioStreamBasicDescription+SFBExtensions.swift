@@ -485,7 +485,12 @@ private func formatIDName(_ formatID: AudioFormatID) -> String {
 	case kAudioFormatOpus: 					return "Opus"
 	case kAudioFormatAPAC: 					return "Apple Positional Audio Codec"
 
-	default: 								return "'\(formatID.fourCC)'"
+	default:
+		if formatID.isPrintable {
+			return "'\(formatID.fourCC)'"
+		} else {
+			return String(format: "0x%.02x%.02x%.02x%.02x", UInt8(formatID >> 24), UInt8((formatID >> 16) & 0xff), UInt8((formatID >> 8) & 0xff), UInt8(formatID & 0xff))
+		}
 	}
 }
 
@@ -509,5 +514,13 @@ private extension UInt32 {
 			UInt8(self & 0xff),
 			0
 		])
+	}
+
+	/// Returns `true` if `self` consists of four printable ASCII characters
+	var isPrintable: Bool {
+		func isPrint(_ c: UInt8) -> Bool {
+			c > 0x1f && c < 0x7f
+		}
+		return isPrint(UInt8(self >> 24)) && isPrint(UInt8((self >> 16) & 0xff)) && isPrint(UInt8((self >> 8) & 0xff)) && isPrint(UInt8(self & 0xff))
 	}
 }
