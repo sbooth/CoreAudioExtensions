@@ -6,6 +6,7 @@
 
 import Foundation
 import CoreAudioTypes
+import AudioToolbox
 
 extension AudioStreamBasicDescription {
 
@@ -291,8 +292,25 @@ extension AudioStreamBasicDescription {
 		(mBytesPerFrame == other.mBytesPerFrame || mBytesPerFrame == 0 || other.mBytesPerFrame == 0)
 	}
 
+	/// Returns the name of `self`
+	///
+	/// This is the value of `kAudioFormatProperty_FormatName`
+	public var formatName: String
+	{
+		var value: Unmanaged<CFString>?
+		var dataSize: UInt32 = UInt32(MemoryLayout<CFString>.stride)
+		let result = withUnsafePointer(to: self) {
+			AudioFormatGetProperty(kAudioFormatProperty_FormatName, UInt32(MemoryLayout<Self>.stride), $0, &dataSize, &value)
+		}
+		if result == noErr, let name = value?.takeUnretainedValue() {
+			return name as String
+		} else {
+			return ""
+		}
+	}
+
 	/// Returns a description of `self`
-	public var streamDescription: String {
+	public var formatDescription: String {
 		var result: String
 
 		// Channels and sample rate
