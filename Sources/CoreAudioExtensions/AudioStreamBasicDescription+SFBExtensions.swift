@@ -404,7 +404,7 @@ extension AudioStreamBasicDescription {
 			result.append("\(formatIDName(mFormatID))")
 
 			if mFormatFlags != 0 {
-				result.append(String(format: " (0x%.08x)", mFormatFlags))
+				result.append(String(format: " (0x%x)", mFormatFlags))
 			}
 
 			result.append(", \(mBitsPerChannel) bits/channel, \(mBytesPerPacket) bytes/packet, \(mFramesPerPacket) frames/packet, \(mBytesPerFrame) bytes/frame")
