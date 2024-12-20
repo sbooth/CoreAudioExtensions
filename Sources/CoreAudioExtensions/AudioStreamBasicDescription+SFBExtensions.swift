@@ -314,11 +314,7 @@ extension AudioStreamBasicDescription {
 		var result: String
 
 		// Channels and sample rate
-		if(rint(mSampleRate) == mSampleRate) {
-			result = "\(mChannelsPerFrame) ch @ \(Int64(mSampleRate)) Hz, "
-		} else {
-			result = String(format: "\(mChannelsPerFrame) ch @ %.2f Hz, ", mSampleRate)
-		}
+		result = String(format: "\(mChannelsPerFrame) ch @ %g Hz, ", mSampleRate)
 
 		// Shorter description for common formats
 		if let commonFormat {
