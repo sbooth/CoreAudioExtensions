@@ -7,6 +7,7 @@
 
 import Foundation
 import CoreAudioTypes
+import AudioToolbox
 
 extension AudioChannelLayout {
 	/// Returns `true` if this channel layout uses channel descriptions
@@ -27,6 +28,25 @@ extension AudioChannelLayout {
 			return mChannelBitmap.channelCount
 		} else {
 			return AudioChannelLayoutTag_GetNumberOfChannels(mChannelLayoutTag)
+		}
+	}
+
+	/// Returns the name of `self`
+	///
+	/// This is the value of `kAudioFormatProperty_ChannelLayoutName`
+	public var layoutName: String
+	{
+		var value: Unmanaged<CFString>?
+
+		let size = MemoryLayout<AudioChannelLayout>.offset(of: \.mChannelDescriptions)! + Int(mNumberChannelDescriptions) * MemoryLayout<AudioChannelDescription>.stride
+		var dataSize: UInt32 = UInt32(MemoryLayout<CFString>.stride)
+		let result = withUnsafePointer(to: self) {
+			AudioFormatGetProperty(kAudioFormatProperty_ChannelLayoutName, UInt32(size), $0, &dataSize, &value)
+		}
+		if result == noErr, let name = value?.takeUnretainedValue() {
+			return name as String
+		} else {
+			return ""
 		}
 	}
 
